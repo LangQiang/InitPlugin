@@ -1,0 +1,26 @@
+apply plugin: 'java'
+
+repositories {
+    google()
+    mavenCentral()
+}
+
+sourceSets {
+
+    main{
+        java{
+            srcDir 'src/main/java'
+        }
+        resources {
+            srcDir 'src/main/resources'
+        }
+    }
+}
+
+dependencies {
+    implementation gradleApi()
+    implementation localGroovy()
+    implementation 'com.android.tools.build:gradle:3.2.1'
+    //ASM依赖
+    implementation 'org.ow2.asm:asm:7.1'
+    implementation 'org.ow2.asm:asm-commons:7.1'}
