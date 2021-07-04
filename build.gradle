@@ -1,4 +1,6 @@
 apply plugin: 'java'
+apply plugin: 'maven'
+
 
 repositories {
     google()
@@ -23,4 +25,14 @@ dependencies {
     implementation 'com.android.tools.build:gradle:3.2.1'
     //ASM依赖
     implementation 'org.ow2.asm:asm:7.1'
-    implementation 'org.ow2.asm:asm-commons:7.1'}
+    implementation 'org.ow2.asm:asm-commons:7.1'
+}
+
+uploadArchives {
+    repositories.mavenDeployer {
+        repository(url: uri('repo')) //仓库的路径，此处是项目根目录下的 repo 的文件夹
+        pom.groupId = 'com.lq.plugin.init'  //groupId ，自行定义，一般是包名
+        pom.artifactId = 'InitPlugin' //artifactId ，自行定义
+        pom.version = '1.0.0' //version 版本号
+    }
+}

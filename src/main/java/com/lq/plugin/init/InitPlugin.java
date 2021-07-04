@@ -1,23 +1,22 @@
 package com.lq.plugin.init;
 
 import com.android.build.gradle.AppExtension;
+import com.lq.plugin.init.transform.InitTransform;
 
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
-
-import java.io.File;
+import org.jetbrains.annotations.NotNull;
 
 public class InitPlugin implements Plugin<Project> {
     @Override
-    public void apply(Project project) {
-        File file = new File("init.config");
-        if (file.exists()) {
-            file.delete();
+    public void apply(@NotNull Project project) {
+        Log.e("INIT Plugin Attach");
+        ConfigFileMgr.getInstance().deleteConfig();
+        AppExtension appExtension = project.getExtensions().findByType(AppExtension.class);
+        if (appExtension != null) {
+            appExtension.registerTransform(new InitTransform(project));
+        } else {
+            Log.e("appExtension is null");
         }
-        System.out.println("\033[0;34m INIT Plugin Attach \033[0m");
-        System.out.println("\033[0;34m " + project.getName() +" \033[0m");
-
-        project.getExtensions().findByType(AppExtension.class).registerTransform(new InitTransform(project));
-
     }
 }
