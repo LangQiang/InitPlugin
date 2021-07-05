@@ -11,7 +11,6 @@ public class InitPlugin implements Plugin<Project> {
     @Override
     public void apply(@NotNull Project project) {
         Log.e("INIT Plugin Attach");
-        ConfigFileMgr.getInstance().deleteConfig();
         AppExtension appExtension = project.getExtensions().findByType(AppExtension.class);
         if (appExtension != null) {
             appExtension.registerTransform(new InitTransform(project));

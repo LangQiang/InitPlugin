@@ -47,6 +47,7 @@ public class InitTransform extends Transform {
 
 
     public InitTransform(Project project) {
+        ConfigFileMgr.getInstance().deleteConfig();
         this.project = project;
     }
 
