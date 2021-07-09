@@ -11,16 +11,20 @@ import java.util.Map;
 public class TopoSort {
 
     public static ArrayList<InitClassInfo> sort(ArrayList<InitClassInfo> initClassInfos) {
-        Map<String, InitClassInfo> noDuplicateList = duplicateRemoval(initClassInfos);
-        List<String> nodes = new ArrayList<>(noDuplicateList.keySet());
+
+        List<InitClassInfo> noDuplicateList = duplicateRemoval(initClassInfos);
 
         ArrayList<InitClassInfo> sortedList = new ArrayList<>();
 
-        while (nodes.size() != 0) {
+        Log.e(noDuplicateList.size() + "");
+
+        while (noDuplicateList.size() != 0) {
             List<String> keys = new ArrayList<>();
-            String key = nodes.get(0);
-            keys.add(key);
-            find0(key, noDuplicateList, sortedList, nodes, keys);
+            InitClassInfo currentNode = noDuplicateList.get(0);
+            if (currentNode.moduleName != null && !currentNode.moduleName.equals("")) {
+                keys.add(currentNode.moduleName);
+            }
+            find0(currentNode, noDuplicateList, sortedList, keys);
         }
 
         Log.e(sortedList.toString());
@@ -28,28 +32,57 @@ public class TopoSort {
         return sortedList;
     }
 
-    private static void find0(String key, Map<String, InitClassInfo> noDuplicateList, ArrayList<InitClassInfo> sortedList, List<String> nodes, List<String> keys) {
-        InitClassInfo initClassInfo = noDuplicateList.get(key);
-        if (initClassInfo == null || initClassInfo.dependSet == null || initClassInfo.dependSet.size() == 0) {
-            removeDepend(noDuplicateList, key);
-            if (nodes.remove(key)) {
-                sortedList.add(initClassInfo);
+    private static void find0(InitClassInfo currentNode, List<InitClassInfo> noDuplicateList, ArrayList<InitClassInfo> sortedList, List<String> keys) {
+        if (currentNode.dependSet == null || currentNode.dependSet.size() == 0) {
+            removeDepend(noDuplicateList, currentNode.moduleName);
+            if (noDuplicateList.remove(currentNode)) {
+                sortedList.add(currentNode);
             }
-        } else {
-            String nextKey = initClassInfo.dependSet.iterator().next();
-            int dupIndex = keys.indexOf(nextKey);
-            if (dupIndex >= 0) {
-                throw new RuntimeException("input err! 存在环：" + keys.subList(dupIndex, keys.size()));
-            }
-            keys.add(nextKey);
-            find0(nextKey, noDuplicateList, sortedList, nodes, keys);
+            return;
         }
+
+        InitClassInfo nextNode = null;
+        String nextKey = null;
+        for (String key : currentNode.dependSet) {
+            if (key != null && !"".equals(key)) {
+                InitClassInfo node = getNextNode(key, noDuplicateList);
+                if (node != null) {
+                    nextNode = node;
+                    nextKey = key;
+                    break;
+                }
+            }
+        }
+
+        if (nextNode == null) {
+            removeDepend(noDuplicateList, currentNode.moduleName);
+            if (noDuplicateList.remove(currentNode)) {
+                sortedList.add(currentNode);
+            }
+            return;
+        }
+
+        int dupIndex = keys.indexOf(nextKey);
+        if (dupIndex >= 0) {
+            throw new RuntimeException("input err! circular dependencies：" + keys.subList(dupIndex, keys.size()));
+        }
+        keys.add(nextKey);
+        find0(nextNode, noDuplicateList, sortedList, keys);
     }
 
-    private static void removeDepend(Map<String, InitClassInfo> noDuplicateList, String key) {
-        for (Map.Entry<String, InitClassInfo> stringInitClassInfoEntry : noDuplicateList.entrySet()) {
-            InitClassInfo value = stringInitClassInfoEntry.getValue();
-            Iterator<String> iterator = value.dependSet.iterator();
+    private static InitClassInfo getNextNode(String nextKey, List<InitClassInfo> noDuplicateList) {
+        InitClassInfo initClassInfo = null;
+        for (InitClassInfo classInfo : noDuplicateList) {
+            if (classInfo.moduleName.equals(nextKey)) {
+                initClassInfo = classInfo;
+            }
+        }
+        return initClassInfo;
+    }
+
+    private static void removeDepend(List<InitClassInfo> noDuplicateList, String key) {
+        for (InitClassInfo initClassInfo : noDuplicateList) {
+            Iterator<String> iterator = initClassInfo.dependSet.iterator();
             while (iterator.hasNext()) {
                 if (iterator.next().equals(key)) {
                     iterator.remove();
@@ -58,12 +91,12 @@ public class TopoSort {
         }
     }
 
-    private static Map<String, InitClassInfo> duplicateRemoval(ArrayList<InitClassInfo> src) {
+    private static List<InitClassInfo> duplicateRemoval(ArrayList<InitClassInfo> src) {
         Map<String, InitClassInfo> result = new HashMap<>();
 
         for (InitClassInfo initClassInfo : src) {
             result.put(initClassInfo.fullName, initClassInfo);
         }
-        return result;
+        return new ArrayList<>(result.values());
     }
 }

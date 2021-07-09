@@ -7,10 +7,12 @@ public class InitClassInfo {
 
     public String fullName;
 
+    public String moduleName;
+
     public Set<String> dependSet = new HashSet<>();
 
     @Override
     public String toString() {
-        return fullName == null ? "" : fullName;
+        return moduleName == null ? "" : moduleName;
     }
 }

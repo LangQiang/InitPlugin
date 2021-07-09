@@ -12,12 +12,12 @@ public class Test {
     public static void main(String[] aaa) {
 
         String json = "[" +
-                "{\"fullName\":\"a\", \"dependSet\":[\"b\",\"c\",\"\"]}," +
-                "{\"fullName\":\"b\", \"dependSet\":[\"d\",\"e\",\"c\"]}," +
-                "{\"fullName\":\"c\", \"dependSet\":[\"e\"]}," +
-                "{\"fullName\":\"d\", \"dependSet\":[\"f\"]}," +
-                "{\"fullName\":\"e\", \"dependSet\":[\"g\"]}," +
-                "{\"fullName\":\"f\", \"dependSet\":[\"\"]}" +
+                "{\"moduleName\":\"b\",\"fullName\":\"bbb\", \"dependSet\":[\"d\",\"e\",\"c\"]}," +
+                "{\"moduleName\":\"c\",\"fullName\":\"ccc\", \"dependSet\":[\"e\"]}," +
+                "{\"moduleName\":\"d\",\"fullName\":\"ddd\", \"dependSet\":[\"f\"]}," +
+                "{\"moduleName\":\"e\",\"fullName\":\"eee\", \"dependSet\":[\"g\"]}," +
+                "{\"moduleName\":\"a\",\"fullName\":\"aaa\", \"dependSet\":[\"b\",\"c\",\"\"]}," +
+                "{\"moduleName\":\"f\",\"fullName\":\"fff\", \"dependSet\":[]}" +
                 "]";
         ArrayList<InitClassInfo> src = new Gson().fromJson(json, new TypeToken<List<InitClassInfo>>(){}.getType());
         ArrayList<InitClassInfo> sort = TopoSort.sort(src);
