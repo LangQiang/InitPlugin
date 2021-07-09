@@ -1,18 +1,15 @@
 package com.lq.plugin.init.visitor;
 
-import com.lq.plugin.init.ConfigFileMgr;
-import com.lq.plugin.init.Log;
+import com.lq.plugin.init.InitClassInfo;
+import com.lq.plugin.init.utils.ConfigFileMgr;
+import com.lq.plugin.init.utils.Log;
+import com.lq.plugin.init.utils.TopoSort;
 
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.commons.AdviceAdapter;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
 
 
@@ -37,19 +34,21 @@ public class InitMethodVisitor extends AdviceAdapter implements Opcodes {
     protected void onMethodExit(int opcode) {
         super.onMethodExit(opcode);
 
-        ArrayList<String> initClasses = ConfigFileMgr.getInstance().readConfig();
+        ArrayList<InitClassInfo> initClasses = TopoSort.sort(ConfigFileMgr.getInstance().readConfig());
 
         if (initClasses == null) {
             return;
         }
 
+        Log.listToString(initClasses);
+
         int lineNumber = 19;
-        for (String initClass : initClasses) {
+        for (InitClassInfo initClass : initClasses) {
             Label l2 = new Label();
             mv.visitLabel(l2);
             mv.visitLineNumber(lineNumber++ , l2);
             mv.visitFieldInsn(GETSTATIC, "com/lazylite/bridge/init/ComponentInit", "classNames", "Ljava/util/List;");
-            mv.visitLdcInsn(initClass);
+            mv.visitLdcInsn(initClass.fullName);
             mv.visitMethodInsn(INVOKEINTERFACE, "java/util/List", "add", "(Ljava/lang/Object;)Z", true);
             mv.visitInsn(POP);
         }

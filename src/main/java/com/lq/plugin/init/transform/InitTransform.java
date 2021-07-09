@@ -13,9 +13,9 @@ import com.android.build.api.transform.TransformInvocation;
 import com.android.build.api.transform.TransformOutputProvider;
 import com.android.build.gradle.internal.pipeline.TransformManager;
 import com.android.ide.common.internal.WaitableExecutor;
-import com.lq.plugin.init.ConfigFileMgr;
+import com.lq.plugin.init.utils.ConfigFileMgr;
 import com.lq.plugin.init.visitor.InitClassVisitor;
-import com.lq.plugin.init.Log;
+import com.lq.plugin.init.utils.Log;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;

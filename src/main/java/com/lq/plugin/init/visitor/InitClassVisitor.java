@@ -1,6 +1,6 @@
 package com.lq.plugin.init.visitor;
 
-import com.lq.plugin.init.Log;
+import com.lq.plugin.init.utils.Log;
 
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;

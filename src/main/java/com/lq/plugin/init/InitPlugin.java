@@ -2,6 +2,7 @@ package com.lq.plugin.init;
 
 import com.android.build.gradle.AppExtension;
 import com.lq.plugin.init.transform.InitTransform;
+import com.lq.plugin.init.utils.Log;
 
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;

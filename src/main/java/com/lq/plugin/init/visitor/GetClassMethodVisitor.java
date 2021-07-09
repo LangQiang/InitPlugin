@@ -1,7 +1,5 @@
 package com.lq.plugin.init.visitor;
 
-import com.lq.plugin.init.Log;
-
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;

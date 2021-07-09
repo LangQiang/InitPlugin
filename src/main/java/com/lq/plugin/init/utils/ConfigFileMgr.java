@@ -1,4 +1,7 @@
-package com.lq.plugin.init;
+package com.lq.plugin.init.utils;
+
+import com.google.gson.Gson;
+import com.lq.plugin.init.InitClassInfo;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -30,7 +33,7 @@ public class ConfigFileMgr {
         }
     }
 
-    public ArrayList<String> readConfig() {
+    public ArrayList<InitClassInfo> readConfig() {
         File file = new File("init.config");
         if (!file.exists()) {
             return null;
@@ -38,14 +41,12 @@ public class ConfigFileMgr {
 
         BufferedReader bufferedReader = null;
         try {
-            ArrayList<String> arrayList = new ArrayList<>();
+            ArrayList<InitClassInfo> arrayList = new ArrayList<>();
             bufferedReader = new BufferedReader(new FileReader(file));
             String s = null;
             while ((s = bufferedReader.readLine()) != null) {
-                if (arrayList.contains(s)) {
-                    continue;
-                }
-                arrayList.add(s.replace("\r", "").replace("\n", ""));
+                String json = s.replace("\r", "").replace("\n", "");
+                arrayList.add(new Gson().fromJson(json, InitClassInfo.class));
             }
             return arrayList;
         } catch (FileNotFoundException fnfe) {
