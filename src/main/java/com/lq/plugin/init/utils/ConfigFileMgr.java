@@ -27,16 +27,23 @@ public class ConfigFileMgr {
     }
 
     public void deleteConfig() {
-        File file = new File("init.config");
+        File cacheFile = new File("./.idea", "init.config.cache");
+        File file = new File("./.idea", "init.config");
         if (file.exists()) {
-            file.delete();
+            if (cacheFile.exists()) {
+                cacheFile.delete();
+            }
+            file.renameTo(cacheFile);
         }
     }
 
     public ArrayList<InitClassInfo> readConfig() {
-        File file = new File("init.config");
+        File file = new File("./.idea", "init.config");
         if (!file.exists()) {
-            return null;
+            file = new File("./.idea", "init.config.cache");
+            if (!file.exists()) {
+                return null;
+            }
         }
 
         BufferedReader bufferedReader = null;
