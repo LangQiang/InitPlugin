@@ -1,5 +1,6 @@
 package com.lq.plugin.init.visitor;
 
+import com.lq.plugin.init.DeepLinkClassInfo;
 import com.lq.plugin.init.InitClassInfo;
 import com.lq.plugin.init.utils.ConfigFileMgr;
 import com.lq.plugin.init.utils.Log;
@@ -13,7 +14,7 @@ import org.objectweb.asm.commons.AdviceAdapter;
 import java.util.ArrayList;
 
 
-public class InitMethodVisitor extends AdviceAdapter implements Opcodes {
+public class TestCInitMethodVisitor extends AdviceAdapter implements Opcodes {
 
 
     /**
@@ -26,7 +27,7 @@ public class InitMethodVisitor extends AdviceAdapter implements Opcodes {
      * @param name          the method's name.
      * @param descriptor    the method's descriptor.
      */
-    protected InitMethodVisitor(int api, MethodVisitor methodVisitor, int access, String name, String descriptor) {
+    protected TestCInitMethodVisitor(int api, MethodVisitor methodVisitor, int access, String name, String descriptor) {
         super(api, methodVisitor, access, name, descriptor);
     }
 
@@ -34,7 +35,7 @@ public class InitMethodVisitor extends AdviceAdapter implements Opcodes {
     protected void onMethodExit(int opcode) {
         super.onMethodExit(opcode);
 
-        ArrayList<InitClassInfo> initClasses = TopoSort.sort(ConfigFileMgr.getInstance().readConfig());
+        ArrayList<InitClassInfo> initClasses = TopoSort.sort(ConfigFileMgr.getInstance().readInitConfig());
 
         if (initClasses == null) {
             return;
@@ -50,6 +51,25 @@ public class InitMethodVisitor extends AdviceAdapter implements Opcodes {
             mv.visitFieldInsn(GETSTATIC, "com/lazylite/bridge/init/ComponentInit", "classNames", "Ljava/util/List;");
             mv.visitLdcInsn(initClass.fullName);
             mv.visitMethodInsn(INVOKEINTERFACE, "java/util/List", "add", "(Ljava/lang/Object;)Z", true);
+            mv.visitInsn(POP);
+        }
+
+        ArrayList<DeepLinkClassInfo> deepLinkClassInfos = ConfigFileMgr.getInstance().readDeepLinkConfig();
+
+        if (deepLinkClassInfos == null) {
+            return;
+        }
+
+        Log.listToString(deepLinkClassInfos);
+
+        for (DeepLinkClassInfo deepLinkClassInfo : deepLinkClassInfos) {
+            Label l2 = new Label();
+            mv.visitLabel(l2);
+            mv.visitLineNumber(lineNumber++ , l2);
+            mv.visitFieldInsn(GETSTATIC, "com/lazylite/bridge/router/deeplink/route/RouteMapping", "ROUTE_MAP", "Ljava/util/Map;");
+            mv.visitLdcInsn(deepLinkClassInfo.getPath());
+            mv.visitLdcInsn(deepLinkClassInfo.getFullName());
+            mv.visitMethodInsn(INVOKEINTERFACE, "java/util/Map", "put", "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", true);
             mv.visitInsn(POP);
         }
 

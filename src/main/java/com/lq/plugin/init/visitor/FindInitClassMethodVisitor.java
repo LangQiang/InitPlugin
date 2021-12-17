@@ -6,7 +6,7 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.commons.AdviceAdapter;
 
 
-public class GetClassMethodVisitor extends AdviceAdapter implements Opcodes {
+public class FindInitClassMethodVisitor extends AdviceAdapter implements Opcodes {
 
     private String methodName;
 
@@ -20,7 +20,7 @@ public class GetClassMethodVisitor extends AdviceAdapter implements Opcodes {
      * @param name          the method's name.
      * @param descriptor    the method's descriptor.
      */
-    protected GetClassMethodVisitor(int api, MethodVisitor methodVisitor, int access, String name, String descriptor) {
+    protected FindInitClassMethodVisitor(int api, MethodVisitor methodVisitor, int access, String name, String descriptor) {
         super(api, methodVisitor, access, name, descriptor);
         this.methodName = name;
     }

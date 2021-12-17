@@ -6,13 +6,13 @@ import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
-public class InitClassVisitor extends ClassVisitor implements Opcodes {
+public class ClassVisitorImpl extends ClassVisitor implements Opcodes {
 
     private boolean bThread;
 
     private String mClass;
 
-    public InitClassVisitor(ClassVisitor cv, String clazz) {
+    public ClassVisitorImpl(ClassVisitor cv, String clazz) {
         super(ASM5, cv);
         mClass = clazz;
     }
@@ -36,12 +36,12 @@ public class InitClassVisitor extends ClassVisitor implements Opcodes {
             if ("<clinit>".equals(name)) {
 
                 Log.e("mClass: " + mClass + "   visitMethod <clinit>");
-                return new InitMethodVisitor(ASM5, mv, access, name, desc);
+                return new ComponentCInitMethodVisitor(ASM5, mv, access, name, desc);
 
             } else if ("findInitClassFullNames".equals(name)) {
 
                 Log.e("mClass: " + mClass + "   visitMethod findInitClassFullNames");
-                return new GetClassMethodVisitor(ASM5, mv, access, name, desc);
+                return new FindInitClassMethodVisitor(ASM5, mv, access, name, desc);
 
             }
         }
@@ -51,13 +51,22 @@ public class InitClassVisitor extends ClassVisitor implements Opcodes {
             if ("<clinit>".equals(name)) {
 
                 Log.e("mClass: " + mClass + "   visitMethod <clinit>");
-                return new InitMethodVisitor(ASM5, mv, access, name, desc);
+                return new TestCInitMethodVisitor(ASM5, mv, access, name, desc);
 
             } else if ("findInitClassFullNames".equals(name)) {
 
                 Log.e("mClass: " + mClass + "   visitMethod findInitClassFullNames");
-                return new GetClassMethodVisitor(ASM5, mv, access, name, desc);
+                return new FindInitClassMethodVisitor(ASM5, mv, access, name, desc);
 
+            }
+        }
+
+        if (mClass != null && mClass.contains("com/lazylite/bridge/router/deeplink/route/RouteMapping.class")) {
+            Log.e(mClass);
+            if ("<clinit>".equals(name)) {
+
+                Log.e("mClass: " + mClass + "   visitMethod <clinit>");
+                return new RouteMappingCInitMethodVisitor(ASM5, mv, access, name, desc);
             }
         }
 

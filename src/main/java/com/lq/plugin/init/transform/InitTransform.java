@@ -14,7 +14,7 @@ import com.android.build.api.transform.TransformOutputProvider;
 import com.android.build.gradle.internal.pipeline.TransformManager;
 import com.android.ide.common.internal.WaitableExecutor;
 import com.lq.plugin.init.utils.ConfigFileMgr;
-import com.lq.plugin.init.visitor.InitClassVisitor;
+import com.lq.plugin.init.visitor.ClassVisitorImpl;
 import com.lq.plugin.init.utils.Log;
 
 import org.apache.commons.codec.digest.DigestUtils;
@@ -158,7 +158,7 @@ public class InitTransform extends Transform {
             fileInputStream = new FileInputStream(inputPath);
             ClassReader classReader = new ClassReader(fileInputStream);
             ClassWriter classWriter = new ClassWriter(classReader, ClassWriter.COMPUTE_MAXS);
-            ClassVisitor classVisitor = new InitClassVisitor(classWriter, input.getName());
+            ClassVisitor classVisitor = new ClassVisitorImpl(classWriter, input.getName());
             classReader.accept(classVisitor, ClassReader.EXPAND_FRAMES);
             fileOutputStream = new FileOutputStream(outputPath);
             byte[] byteCode = classWriter.toByteArray();
@@ -260,12 +260,13 @@ public class InitTransform extends Transform {
     }
 
     private static boolean needModify(String className) {
-        return "com.lazylite.bridge.init.ComponentInit".equals(className);
+        return "com.lazylite.bridge.init.ComponentInit".equals(className)
+                || "com.lazylite.bridge.router.deeplink.route.RouteMapping".equals(className);
     }
 
     private static byte[] modifyClass(byte[] srcClass, String clazz) {
         ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS);
-        ClassVisitor classVisitor = new InitClassVisitor(classWriter, clazz);
+        ClassVisitor classVisitor = new ClassVisitorImpl(classWriter, clazz);
         ClassReader cr = new ClassReader(srcClass);
 //        cr.accept(classVisitor, ClassReader.SKIP_FRAMES);
         cr.accept(classVisitor, ClassReader.EXPAND_FRAMES);
