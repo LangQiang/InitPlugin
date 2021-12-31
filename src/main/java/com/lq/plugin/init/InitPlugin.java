@@ -2,15 +2,31 @@ package com.lq.plugin.init;
 
 import com.android.build.gradle.AppExtension;
 import com.lq.plugin.init.transform.InitTransform;
+import com.lq.plugin.init.utils.ConfigFileMgr;
 import com.lq.plugin.init.utils.Log;
 
+import org.gradle.BuildListener;
+import org.gradle.BuildResult;
+import org.gradle.api.Action;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
+import org.gradle.api.Task;
+import org.gradle.api.initialization.Settings;
+import org.gradle.api.invocation.Gradle;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 public class InitPlugin implements Plugin<Project> {
     @Override
     public void apply(@NotNull Project project) {
+
+        List<String> taskNames = project.getGradle().getStartParameter().getTaskNames();
+
+        if (taskNames.size() > 0 && "clean".equals(taskNames.get(0))) {
+            ConfigFileMgr.getInstance().deleteConfig();
+        }
+
         Log.e("INIT Plugin Attach");
         AppExtension appExtension = project.getExtensions().findByType(AppExtension.class);
         if (appExtension != null) {

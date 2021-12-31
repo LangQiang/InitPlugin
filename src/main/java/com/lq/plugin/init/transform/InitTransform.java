@@ -47,7 +47,7 @@ public class InitTransform extends Transform {
 
 
     public InitTransform(Project project) {
-        ConfigFileMgr.getInstance().deleteConfig();
+        ConfigFileMgr.getInstance().addConfig();
         this.project = project;
     }
 
@@ -108,7 +108,7 @@ public class InitTransform extends Transform {
         }
         //等待所有任务结束
         waitableExecutor.waitForTasksWithQuickFail(true);
-        ConfigFileMgr.getInstance().deleteConfig();
+        ConfigFileMgr.getInstance().addConfig();
         long cost = System.currentTimeMillis() - startTime;
         Log.e("init transform cost:" + cost + "ms");
 

@@ -5,9 +5,11 @@ import com.lq.plugin.init.DeepLinkClassInfo;
 import com.lq.plugin.init.InitClassInfo;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +30,48 @@ public class ConfigFileMgr {
         private static final ConfigFileMgr INSTANCE = new ConfigFileMgr();
     }
 
+    public void addConfig() {
+        addConfig("init.config");
+        addConfig("deeplink.config");
+    }
+
+    private void addConfig(String fileName) {
+        File cacheFile = new File("./.idea", fileName + ".cache");
+        File file = new File("./.idea", fileName);
+        if (!file.exists()) {
+            return;
+        }
+        BufferedReader bufferedReader = null;
+        BufferedWriter bufferedWriter = null;
+        try {
+            bufferedReader = new BufferedReader(new FileReader(file));
+            bufferedWriter = new BufferedWriter(new FileWriter(cacheFile, true));
+            String s = null;
+            while ((s = bufferedReader.readLine()) != null) {
+                bufferedWriter.write(s);
+                bufferedWriter.newLine();
+            }
+        } catch (FileNotFoundException fnfe) {
+            Log.e(fnfe.getMessage());
+        } catch (IOException e) {
+            Log.e(e.getMessage());
+        }finally {
+            try {
+                if (bufferedReader != null) {
+                    bufferedReader.close();
+                }
+                if (bufferedWriter != null) {
+                    bufferedWriter.close();
+                }
+            } catch (IOException ioe) {
+                Log.e(ioe.getMessage());
+            }
+            file.delete();
+        }
+    }
+
     public void deleteConfig() {
+        Log.e("delete config");
         deleteConfig("init.config");
         deleteConfig("deeplink.config");
     }
@@ -36,12 +79,8 @@ public class ConfigFileMgr {
     private void deleteConfig(String fileName) {
         File cacheFile = new File("./.idea", fileName + ".cache");
         File file = new File("./.idea", fileName);
-        if (file.exists()) {
-            if (cacheFile.exists()) {
-                cacheFile.delete();
-            }
-            file.renameTo(cacheFile);
-        }
+        cacheFile.delete();
+        file.delete();
     }
 
     public ArrayList<DeepLinkClassInfo> readDeepLinkConfig() {
@@ -88,7 +127,9 @@ public class ConfigFileMgr {
             String s = null;
             while ((s = bufferedReader.readLine()) != null) {
                 String json = s.replace("\r", "").replace("\n", "");
-                arrayList.add(json);
+                if (!arrayList.contains(json)) {
+                    arrayList.add(json);
+                }
             }
             return arrayList;
         } catch (FileNotFoundException fnfe) {
