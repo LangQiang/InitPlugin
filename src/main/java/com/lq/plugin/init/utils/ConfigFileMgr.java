@@ -112,26 +112,29 @@ public class ConfigFileMgr {
     }
 
     private List<String> readConfig(String fileName) {
+        List<String> list = new ArrayList<>();
+        readFile(list, fileName + ".cache");
+        readFile(list, fileName);
+        return list;
+    }
+
+    private void readFile(List<String> list, String fileName) {
         File file = new File("./.idea", fileName);
         if (!file.exists()) {
-            file = new File("./.idea", fileName + ".cache");
-            if (!file.exists()) {
-                return null;
-            }
+            return;
         }
 
         BufferedReader bufferedReader = null;
         try {
-            ArrayList<String> arrayList = new ArrayList<>();
             bufferedReader = new BufferedReader(new FileReader(file));
             String s = null;
             while ((s = bufferedReader.readLine()) != null) {
                 String json = s.replace("\r", "").replace("\n", "");
-                if (!arrayList.contains(json)) {
-                    arrayList.add(json);
+                if (!list.contains(json)) {
+                    list.add(json);
                 }
             }
-            return arrayList;
+            return;
         } catch (FileNotFoundException fnfe) {
             Log.e(fnfe.getMessage());
         } catch (IOException e) {
@@ -145,6 +148,5 @@ public class ConfigFileMgr {
                 Log.e(ioe.getMessage());
             }
         }
-        return null;
     }
 }
