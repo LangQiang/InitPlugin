@@ -235,15 +235,12 @@ public class InitTransform extends Transform {
             if (entryName.endsWith(".DSA") || entryName.endsWith(".SF") /* || entryName.endsWith(".RSA") */) {
                 //ignore
             } else {
-                String className;
                 JarEntry jarEntry = new JarEntry(entryName);
                 jarOutputStream.putNextEntry(jarEntry);
                 byte[] modifiedClassBytes = null;
                 byte[] sourceClassBytes = IOUtils.toByteArray(inputStream);
                 if (entryName.endsWith(".class")) {
-                    className = entryName.replace(Matcher.quoteReplacement(File.separator), ".")
-                            .replace(".class", "");
-                    if (needModify(className)) {
+                    if (needModify(entryName)) {
                         modifiedClassBytes = modifyClass(sourceClassBytes, entryName);
                     }
                 }
@@ -260,8 +257,13 @@ public class InitTransform extends Transform {
     }
 
     private static boolean needModify(String className) {
-        return "com.lazylite.bridge.init.ComponentInit".equals(className)
-                || "com.lazylite.bridge.router.deeplink.route.RouteMapping".equals(className);
+
+        if (className == null || !className.startsWith("com/lazylite/bridge")) {
+            return false;
+        }
+
+        return "com/lazylite/bridge/init/ComponentInit.class".equals(className)
+                || "com/lazylite/bridge/router/deeplink/route/RouteMapping.class".equals(className);
     }
 
     private static byte[] modifyClass(byte[] srcClass, String clazz) {
