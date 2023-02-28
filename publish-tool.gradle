@@ -1,0 +1,86 @@
+def printMsg(msg) {
+    println String.format("---------  %s  ---------", msg)
+}
+
+def groupIdStr = 'io.github.langqiang'
+
+def sonaTypeUserName = '493062120'
+def sonaTypePassWord = 'Lqiang409409!'
+
+
+def publishCloser = {
+    publishing {
+        repositories {
+            maven {
+                if (project.publishVersion.endsWith("SNAPSHOT")) {
+                    url 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
+                    printMsg('repo maven snapshot')
+                } else {
+                    url 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
+                    printMsg('repo maven release')
+                }
+                printMsg('repo maven credentials :' + sonaTypeUserName + " " + sonaTypePassWord)
+                credentials {
+                    username sonaTypeUserName
+                    password sonaTypePassWord
+                }
+            }
+        }
+
+        publications {
+            MyPublication(MavenPublication) {
+                groupId groupIdStr
+                artifactId project.publishArtifactName
+                version project.publishVersion
+                printMsg('publications type ' + project.publishComponentType)
+                switch (project.publishComponentType) {
+                    case 'aar-debug':
+                        from components.debug
+                        break
+                    case 'aar-release':
+                        from components.release
+                        break
+                    case 'apk-debug':
+                        from components.debug_apk
+                        break
+                    case 'apk-release':
+                        from components.release_apk
+                        break
+                    case 'java':
+                        from components.java
+                        break
+                    default:
+//                        忽略平台 web
+                        break
+                }
+
+            }
+        }
+    }
+}
+
+if ("java" == project.publishComponentType) {
+    publishCloser('java')
+} else {
+    afterEvaluate {
+        publishCloser('java')
+    }
+}
+
+
+afterEvaluate {
+    publish.doLast {
+        def ret = ""
+        if (project.publishVersion.endsWith("SNAPSHOT")) {
+            ret += 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
+        } else {
+            ret += 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
+        }
+        ret += groupIdStr.replaceAll("\\.", "/")
+        ret += "/"
+        ret += project.publishArtifactName
+        ret += "/"
+        ret += project.publishVersion
+        printMsg(ret)
+    }
+}
